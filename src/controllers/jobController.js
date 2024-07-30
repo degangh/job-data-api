@@ -3,12 +3,26 @@ const Job = require('../models/jobModel');
 const getJobs = async (req, res) => {
     const page = req.query.page || 1;
     const perPage = 30;
-    const jobs = await Job.find()
+
+    const relevanceToPhp = parseInt(req.query.relevance_to_php_developer);
+    const jobLocation = req.query.job_location;
+
+    let query = {};
+
+    if (!isNaN(relevanceToPhp)) {
+        query.relevance_to_php_developer = relevanceToPhp;
+    }
+
+    if (jobLocation) {
+        query.job_location = { $regex: jobLocation, $options: 'i' }; 
+    }
+
+    const jobs = await Job.find(query)
     .sort({post_date: -1})
     .skip( (page - 1) * perPage)
     .limit(perPage);
 
-    const totalJobs = await Job.countDocuments({});
+    const totalJobs = await Job.countDocuments(query);
     const totalPages = Math.ceil(totalJobs / perPage);
 
     res.status(200).json({
