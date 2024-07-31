@@ -4,13 +4,13 @@ const getJobs = async (req, res) => {
     const page = req.query.page || 1;
     const perPage = 30;
 
-    const relevanceToPhp = parseInt(req.query.relevance_to_php_developer);
+    const relevance = parseInt(req.query.relevance_to_php_developer);
     const jobLocation = req.query.job_location;
 
     let query = {};
 
-    if (!isNaN(relevanceToPhp)) {
-        query.relevance_to_php_developer = relevanceToPhp;
+    if (!isNaN(relevance)) {
+        query.relevance_to_php_developer = relevance;
     }
 
     if (jobLocation) {
