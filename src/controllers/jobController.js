@@ -4,7 +4,7 @@ const getJobs = async (req, res) => {
     const page = req.query.page || 1;
     const perPage = 30;
 
-    const relevance = parseInt(req.query.relevance_to_php_developer);
+    const relevance = parseInt(req.query.relevance);
     const jobLocation = req.query.job_location;
 
     let query = {};
