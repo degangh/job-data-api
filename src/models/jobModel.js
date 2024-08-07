@@ -22,13 +22,17 @@ const jobSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    relevance_to_php: {
+    relevance_to_search: {
         type: Number,
         required: true
     },
     post_data: {
         type: Date,
         required: true
+    },
+    channel: {
+        type: String,
+        required: false
     }
 });
 

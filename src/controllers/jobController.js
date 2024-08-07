@@ -1,44 +1,68 @@
 const Job = require('../models/jobModel');
 
 const getJobs = async (req, res) => {
-    const page = req.query.page || 1;
-    const perPage = 30;
+    
+    try {
 
-    const relevance = parseInt(req.query.relevance);
-    const jobLocation = req.query.job_location;
+        const page = req.query.page || 1;
+        const perPage = 30;
 
-    let query = {};
+        const relevance = parseInt(req.query.relevance);
+        const jobLocation = req.query.job_location;
 
-    if (!isNaN(relevance)) {
-        query.relevance_to_php_developer = relevance;
+        let query = {};
+
+        if (!isNaN(relevance)) {
+            query.relevance_to_search = relevance;
+        }
+
+        if (jobLocation) {
+            query.job_location = { $regex: jobLocation, $options: 'i' }; 
+        }
+
+        if (channel) {
+            query.channel = { $regex: channel, $options: 'i' }; 
+        }
+
+        const jobs = await Job.find(query)
+        .sort({post_date: -1})
+        .skip( (page - 1) * perPage)
+        .limit(perPage);
+
+        const channels = await Job.distinct('channel')
+
+        const totalJobs = await Job.countDocuments(query);
+        const totalPages = Math.ceil(totalJobs / perPage);
+
+        res.status(200).json({
+            jobs,
+            page,
+            perPage,
+            totalPages,
+            totalJobs,
+            channels
+        });
     }
-
-    if (jobLocation) {
-        query.job_location = { $regex: jobLocation, $options: 'i' }; 
+    catch(err) {
+        res.status(200).json({
+            message: err.message
+        })
     }
-
-    const jobs = await Job.find(query)
-    .sort({post_date: -1})
-    .skip( (page - 1) * perPage)
-    .limit(perPage);
-
-    const totalJobs = await Job.countDocuments(query);
-    const totalPages = Math.ceil(totalJobs / perPage);
-
-    res.status(200).json({
-        jobs,
-        page,
-        perPage,
-        totalPages,
-        totalJobs
-    });
 
 }
 
 const getJobById = async (req, res) => {
-    const { id } = req.params;
-    const job = await Job.findById(id);
-    res.status(200).json(job);
+    
+    try{
+        const { id } = req.params;
+        const job = await Job.findById(id);
+        res.status(200).json(job);
+    }
+    catch(err){
+        res.status(500).json({
+            error:err.message
+        })
+    }
 }  
 
 module.exports = {
