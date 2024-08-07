@@ -9,6 +9,7 @@ const getJobs = async (req, res) => {
 
         const relevance = parseInt(req.query.relevance);
         const jobLocation = req.query.job_location;
+        const channel = req.query.channel
 
         let query = {};
 
