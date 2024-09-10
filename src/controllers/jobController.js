@@ -9,7 +9,8 @@ const getJobs = async (req, res) => {
 
         const relevance = parseInt(req.query.relevance);
         const jobLocation = req.query.job_location;
-        const channel = req.query.channel
+        const channel = req.query.channel;
+        const keyword = req.query.keyword;
 
         let query = {};
 
@@ -23,6 +24,13 @@ const getJobs = async (req, res) => {
 
         if (channel) {
             query.channel = { $regex: channel, $options: 'i' }; 
+        }
+
+        if (keyword) {
+            query.$or = [
+                { keyword: { $regex: keyword, $options: 'i' } },
+                { requirements: { $elemMatch: { $regex: keyword, $options: 'i' } } }
+            ];
         }
 
         const jobs = await Job.find(query)
